@@ -44,12 +44,19 @@ unsigned long next_prime(unsigned long n) {
 // test ルーチン
 // コマンドラインから3つの数n, m, lを得て、n以上m未満の素数がいくつあるか数える
 // lが0以外なら素数自体の値も出力する
-  
+// ex)
+// 以下に64bit以下の最も大きい素数の2つを出力する
+// ./miller_rabin_test 18446744073709551531 18446744073709551615 1
+// 18446744073709551533 18446744073709551557
+// 2
+// 大きなほうから素数約1億個を判定する時間は24sec
+// ./miller_rabin_test 18446744073700000000 18446744073709551615 0
+// 215247
 int main(int argc, char  *  argv[]) {
      // unsigned long n = atol(argv[1]); 
      // printf("%ld\n", next_prime(n)); 
-     unsigned long n = atol(argv[1]), nn = n;  
-     unsigned long m = atol(argv[2]);
+     unsigned long n = strtoul(argv[1],0,10), nn = n;  
+     unsigned long m = strtoul(argv[2],0,10);
      // unsigned long n = 1073741824, nn = n, m = n + 100; 
      int l = atoi(argv[3]);
      // int l = 1;   
@@ -59,7 +66,7 @@ int main(int argc, char  *  argv[]) {
     for(; n<m; n ++ ) {
        if (is_prime(n)) {
            c ++ ; 
-           if (l) printf("%ld ", n);
+           if (l) printf("%lu ", n);
        }
     }
     printf("\n%ld\n", c); 

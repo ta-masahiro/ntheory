@@ -78,6 +78,8 @@ int factor(unsigned long n, unsigned long * factor_list) {
 int main(int argc, char * argv[]) {
     // 最大の素因数を持つ2^64-1以下の整数をきちんと分解できることを確認
     // 18446744030759878681=4294967291*4294967291
+    // また最大の64bit整数の素因数分解は以下
+    // 18446744073709551615 = 3*5*17*257*641*65537*6700417
     //unsigned long n = atol(argv[1]), m = 1;printf("%lu\n",n); 
     unsigned long n = strtoul(argv[1],0,10), m = 1;printf("%lu\n",n); 
     unsigned long factor_list[MAX_LIST];

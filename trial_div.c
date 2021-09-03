@@ -33,9 +33,9 @@ int trial_div(unsigned long n) {
     }
 }
 int main(int argc, char* argv[]) {
-    unsigned long n=atol(argv[1]);
-    unsigned long m=atol(argv[2]);
-    unsigned long l=atol(argv[3]);
+    unsigned long n=strtoul(argv[1],0,10);
+    unsigned long m=strtoul(argv[2],0,10);
+    int l=atoi(argv[3]);
     unsigned long c=0;
     for(;n<m;n++) {
         if (trial_div(n)) {c++;if (l) printf("%lu ",n);}
