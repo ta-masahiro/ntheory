@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define MAX_LIST 64 
+#include <gmp.h>
+#define MAX_LIST 2048 
 #define TRUE 1
 #define FALSE 0
 int prime_list[] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97, \
@@ -48,39 +49,51 @@ int factor(unsigned long n, unsigned long * factor_list) {
     }
 }
 
-int ifactor(unsigned long n, unsigned long * factor_list) {
+int ifactor(mpz_t n, mpz_ptr * factor_list) {
     int count = 0, p;
-    unsigned long sq;
-    unsigned long i ;
-    while (TRUE) {
-        if (n<=1) return count;
-        if (n % 2==0) {
-            factor_list[count++]=2;
-            n/=2;
+    mpz_ptr sq=(mpz_ptr)malloc(sizeof(MP_INT)) ; mpz_init(sq);
+    mpz_ptr i=(mpz_ptr) malloc(sizeof(MP_INT));  mpz_init(i);
+    mpz_ptr wp=(mpz_ptr)malloc(sizeof(MP_INT)),wm=(mpz_ptr)malloc(sizeof(MP_INT)) ; mpz_init(wp); mpz_init(wm);
+    mpz_ptr q=(mpz_ptr)malloc(sizeof(MP_INT)),r=(mpz_ptr)malloc(sizeof(MP_INT));mpz_init(q);mpz_init(r);
+    mpz_ptr L_TWO=(mpz_ptr)malloc(sizeof(MP_INT)),L_THREE=(mpz_ptr)malloc(sizeof(MP_INT));mpz_init_set_ui(L_TWO,2);mpz_init_set_ui(L_THREE,3);
+    while (TRUE) {printf("p:%s",mpz_get_str(NULL,10,n));if (count !=0) printf(" q:%s",mpz_get_str(NULL,10,factor_list[count-1]));printf("\n");
+        if (mpz_cmp_ui(n,1)==0) return count;
+        mpz_tdiv_qr_ui(q,r,n,2);
+        if (mpz_cmp_ui(r,0)==0) {
+            factor_list[count++]=L_TWO;
+            mpz_set(n,q);
             continue;
         }
-        if (n % 3 ==0) {
-            factor_list[count++]=3;
-            n/=3;
+        mpz_tdiv_qr_ui(q,r,n,3);
+        if (mpz_cmp_ui(r,0)==0) {
+            factor_list[count++]=L_THREE;
+            mpz_set(n,q);
             continue;
         }
-        sq =sqrt(n)+2;
-        i = 6;
+
+        //sq =sqrt(n);
+        mpz_sqrt(sq, n) ;mpz_add_ui(sq,sq,2);
+        //i = 6;
+        mpz_set_ui(i, 6L);
         p = FALSE;
-        while (i<sq) {
-            if (n % (i-1) == 0 ) {
-                factor_list[count++]=i-1;
-                n /= (i-1);
-                p = TRUE;
-                break;
-            } 
-            if (n % (i+1) == 0) {
-                factor_list[count++]=i+1;
-                n /= (i+1);
+        while (mpz_cmp(i,sq)<0) {
+            mpz_sub_ui(wm,i,1L);
+            mpz_tdiv_qr(q,r,n,wm);
+            if (mpz_cmp_ui(r, 0)==0) {
+                factor_list[count++]=wm;
+                mpz_set(n,q);
                 p = TRUE;
                 break;
             }
-            i += 6;
+            mpz_add_ui(wp,i,1L);
+            mpz_tdiv_qr(q,r,n,wp);
+            if (mpz_cmp_ui(r,0) == 0) {
+                factor_list[count++]=wp;
+                mpz_set(n,q);
+                p = TRUE;
+                break;
+            }
+            mpz_add_ui(i,i,6);
         }
         if (!p) {
             factor_list[count++] = n;
@@ -102,7 +115,7 @@ int factor(unsigned long n, unsigned long * factor_list) {
         for(unsigned long i = 3; i <= sq ;i += 2) {
             if (n % i  == 0 ) {
                 factor_list[count ++ ]  = i;
-                n /= i;
+                n /= i;t
                 if (n <= 2) return count - 1;   
                 // if (count >= MAX_LIST) return - n + 1;
                 p = TRUE;   
@@ -122,15 +135,17 @@ int main(int argc, char * argv[]) {
     // また最大の64bit整数の素因数分解は以下
     // 18446744073709551615 = 3*5*17*257*641*65537*6700417
     //unsigned long n = atol(argv[1]), m = 1;printf("%lu\n",n); 
-    unsigned long n = strtoul(argv[1],0,10), m = 1;printf("%lu\n",n); 
-    unsigned long factor_list[MAX_LIST];
-    
+    mpz_t n,m,l;
+    mpz_init_set_str(n,argv[1],10);mpz_init_set(l,n);
+    printf("%s\n",mpz_get_str(NULL,10,n)); 
+    mpz_ptr *factor_list=(mpz_ptr*)malloc(MAX_LIST*sizeof(MP_INT));
+    mpz_init_set_ui(m,1);
     int count = ifactor(n, factor_list); 
     //int count = factor(n, factor_list); 
     for(int i = 0; i< count; i ++ ) {
-        m *=  * (factor_list + i); 
-        printf("%lu ",  * (factor_list + i)); 
+        mpz_mul(m, m, factor_list[i]); 
+        printf("%s ", mpz_get_str(NULL,10, factor_list[i])); 
     }
-    if (n == m) {printf("OK\n");} 
-    else {printf("NG! %lu %lu\n", n, m);} 
+    if (mpz_cmp(l, m)==0) {printf("OK\n");} 
+    else {printf("NG! %s %s\n", mpz_get_str(NULL,10,l), mpz_get_str(NULL,10,m));} 
 }    
