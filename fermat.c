@@ -7,13 +7,13 @@
 int fermat(mpz_t n, mpz_t a) {
     mpz_t b2; mpz_init(b2);
 
-    mpz_sqrt(a, n);                         // a=aの平方根の切り捨て
+    mpz_sqrt(a, n);                         // a=√a
     mpz_mul(b2,a,a); mpz_sub(b2,b2,n);      // b2=a*a-n
     while (mpz_perfect_square_p(b2) ==0 ) { // b2が平方数でない限り
         mpz_add_ui(a,a,1);                  // a =a+1
         mpz_mul(b2,a,a); mpz_sub(b2, b2, n);// b2 =a*a-n
     }
-    mpz_sqrt(b2,b2);mpz_sub(a,a,b2);
+    mpz_sqrt(b2,b2);mpz_sub(a,a,b2);        // a=a-√b
 }
 //差が15bitの2数の積4096bit整数を分解可能　103418607466800544686566165
 //15782083695141588035522440055811333488072182596961369751867680575328

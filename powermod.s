@@ -27,7 +27,7 @@ powermod:
 	movq	%rdx, %rdi	# apow = (apow * apow) % n
 
 	shrq	%rcx		# m /= 2
-	jne	.L4
+	jne	.L4				# (m /= 2) != 0 -> .L4
 .L3:
 	movq	%r9, %rax
 	xorl	%edx, %edx
