@@ -23,6 +23,25 @@ int pollard_rho(mpz_t n, mpz_t d) {
     if (mpz_cmp(d,n) == 0) return FALSE;
     return TRUE;
 }
+
+int pollard_rho_(mpz_t n, mpz_t d, int max, int maxc) {
+    mpz_t x, y;
+    int trial, c;
+    mpz_init_set_ui(x,2);mpz_init_set_ui(y,2);mpz_set_ui(d,1);
+    for( c==1;c <maxc; c++) {
+        trial = 0;
+        while (mpz_cmp_ui(d,1)==0 &&  trial++ < max ) {
+            mpz_mul(x,x,x);mpz_add_ui(x,x,c);mpz_tdiv_r(x,x,n);
+            mpz_mul(y,y,y);mpz_add_ui(y,y,c);mpz_tdiv_r(y,y,n);
+            mpz_mul(y,y,y);mpz_add_ui(y,y,c);mpz_tdiv_r(y,y,n);
+            mpz_sub(d,x,y);mpz_abs(d,d);
+            mpz_gcd(d,d,n);
+        }
+        //if (mpz_cmp(d,n) == 0) return FALSE;
+        if  (trial<max) return TRUE;
+    }
+    return FALSE;
+}
 // 8番目のフェルマー数2^256+1=115792089237316195423570985008687907853269984665640564039457584007913129639937
 // を1分40秒で因数分解できた(ASUSにて)
 // 1238926361552897 * 93461639715357977769163558199606896584051237541638188580280321
@@ -31,9 +50,12 @@ int main(int argc, char * argv[]) {
     //gmp_randinit_default(state2);
     mpz_t  d; mpz_init(d);
     mpz_t  n; mpz_init_set_str(n, argv[1], 10);
+    int max=atoi(argv[2]);
+    int maxc=atoi(argv[3]);
     if (mpz_probab_prime_p (n,20)) 
         printf("%s is prime\n",mpz_get_str(NULL,10,n));
-    else if (pollard_rho(n,d)) {
+    //else if (pollard_rho(n,d)) {
+    else if (pollard_rho_(n,d,max ,maxc)) {
         mpz_tdiv_q(n,n,d);
         printf("%s is  %s * %s\n",  argv[1], mpz_get_str(NULL,10,d), mpz_get_str(NULL,10,n));
     } else printf("pollard_rho method fail!\n");
