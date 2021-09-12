@@ -1,10 +1,18 @@
- //   Factorization_pollardsP_1 : ポラードの p-1 法を使い素因数分解を行う
+ //   pollard_pm1 : ポラードの p-1 法を使い素因数分解を行う
+ //
  //   n 素因数分解を行う対象の数
  //   g 発見された因数
- //   b 底
+ //   b 底(初期値として与える)
  //   maxC 最大処理回数(指数の最大値 + 1)
+ //
  //   戻り値 : 素因数分解に成功したらTRUEを返す
-int pollard_pm1(mpz_t n, mpz_t g, unsigned long c, unsigned long maxC ) {
+ #include  <stdio.h>
+ #include <stdlib.h>
+ #include <gmp.h>
+ #define TRUE 1
+ #define FALSE 0
+
+int pollard_pm1(mpz_t n, mpz_t g, unsigned long b, unsigned long maxC ) {
     mpz_t m; mpz_set_init_ui(m, b); 
     mpz_t mm1; mpz_init(mm1); 
     mpz_t g; mpz_init(g); 
@@ -28,8 +36,8 @@ int main(int argc, char * argv[]) {
     if (mpz_probab_prime_p (n,20)) 
         printf("%s is prime\n",mpz_get_str(NULL,10,n));
     //else if (pollard_rho(n,d)) {
-    else if (pollard_pm1(n,d,b,maxE)) {
+    else if (pollard_pm1(n, d, b, maxC)) {
         mpz_tdiv_q(n,n,d);
         printf("%s is  %s * %s\n",  argv[1], mpz_get_str(NULL,10,d), mpz_get_str(NULL,10,n));
-    } else printf("pollard_rho method fail!\n");
+    } else printf("pollard p-1 method fail!\n");
 }
