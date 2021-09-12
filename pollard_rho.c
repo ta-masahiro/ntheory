@@ -24,12 +24,12 @@ int pollard_rho(mpz_t n, mpz_t d) {
     return TRUE;
 }
 
-int pollard_rho_(mpz_t n, mpz_t d, int max, int maxc) {
-    mpz_t x, y;
-    int trial, c;
-    mpz_init_set_ui(x,2);mpz_init_set_ui(y,2);mpz_set_ui(d,1);
-    for( c==1;c <maxc; c++) {
+int pollard_rho_(mpz_t n, mpz_t d, unsigned long max, unsigned long maxc) {
+    mpz_t x, y;mpz_init(x);mpz_init(y);
+    unsigned long trial, c;
+    for( c=1;c <=maxc; c++) {
         trial = 0;
+        mpz_set_ui(x,2);mpz_set_ui(y,2);mpz_set_ui(d,1);
         while (mpz_cmp_ui(d,1)==0 &&  trial++ < max ) {
             mpz_mul(x,x,x);mpz_add_ui(x,x,c);mpz_tdiv_r(x,x,n);
             mpz_mul(y,y,y);mpz_add_ui(y,y,c);mpz_tdiv_r(y,y,n);
@@ -37,7 +37,7 @@ int pollard_rho_(mpz_t n, mpz_t d, int max, int maxc) {
             mpz_sub(d,x,y);mpz_abs(d,d);
             mpz_gcd(d,d,n);
         }
-        //if (mpz_cmp(d,n) == 0) return FALSE;
+        if (mpz_cmp(d,n) == 0) continue;
         if  (trial<max) return TRUE;
     }
     return FALSE;
@@ -50,8 +50,8 @@ int main(int argc, char * argv[]) {
     //gmp_randinit_default(state2);
     mpz_t  d; mpz_init(d);
     mpz_t  n; mpz_init_set_str(n, argv[1], 10);
-    int max=atoi(argv[2]);
-    int maxc=atoi(argv[3]);
+    int max=strtoul(argv[2],0,10);
+    int maxc=strtoul(argv[3],0,10);
     if (mpz_probab_prime_p (n,20)) 
         printf("%s is prime\n",mpz_get_str(NULL,10,n));
     //else if (pollard_rho(n,d)) {
