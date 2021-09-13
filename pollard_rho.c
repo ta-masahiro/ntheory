@@ -4,7 +4,7 @@
 #define TRUE 1
 #define  FALSE 0
 
-//gmp_randstate_t state1;
+gmp_randstate_t state1;
 //gmp_randstate_t state2;
 
 int pollard_rho(mpz_t n, mpz_t d) {
@@ -42,11 +42,32 @@ int pollard_rho_(mpz_t n, mpz_t d, unsigned long max, unsigned long maxc) {
     }
     return FALSE;
 }
+
+int pollard_rho__(mpz_t n, mpz_t d, unsigned long max, unsigned long maxc) {
+    mpz_t x, y;mpz_init(x);mpz_init(y);
+    mpz_t cc;mpz_init(cc);
+    unsigned long trial, c;
+    mpz_set_ui(x,2);mpz_set_ui(y,2);mpz_set_ui(d,1);
+    for( c=1;c <=maxc; c++) {
+        trial = 0;
+        while (mpz_cmp_ui(d,1)==0 &&  trial++ < max ) {
+            mpz_mul(x,x,x);mpz_add_ui(x,x,cc);mpz_tdiv_r(x,x,n);
+            mpz_mul(y,y,y);mpz_add_ui(y,y,cc);mpz_tdiv_r(y,y,n);
+            mpz_mul(y,y,y);mpz_add_ui(y,y,cc);mpz_tdiv_r(y,y,n);
+            mpz_sub(d,x,y);mpz_abs(d,d);
+            mpz_gcd(d,d,n);
+        }
+        if (mpz_cmp(d,n) != 0 || trial<max) return TRUE;
+        mpz_urandomm(cc, state1, n);
+        mpz_urandomm(x, state1, n);
+    }
+    return FALSE;
+}
 // 8番目のフェルマー数2^256+1=115792089237316195423570985008687907853269984665640564039457584007913129639937
 // を1分40秒で因数分解できた(ASUSにて)
 // 1238926361552897 * 93461639715357977769163558199606896584051237541638188580280321
 int main(int argc, char * argv[]) {
-    //gmp_randinit_default(state1);
+   gmp_randinit_default( state1);
     //gmp_randinit_default(state2);
     mpz_t  d; mpz_init(d);
     mpz_t  n; mpz_init_set_str(n, argv[1], 10);
